@@ -1,0 +1,1 @@
+/usr/bin/c++  -std=c++11 -pthread -DUNIX CMakeFiles/test.dir/src/cmd_arg_reader.cpp.o CMakeFiles/test.dir/src/oclBandwidthTest.cpp.o CMakeFiles/test.dir/src/oclUtils.cpp.o CMakeFiles/test.dir/src/shrUtils.cpp.o -o ../test   -L/usr/local/cuda/lib64  -Wl,-rpath,/usr/local/cuda/lib64 -lOpenCL -lstdc++fs 

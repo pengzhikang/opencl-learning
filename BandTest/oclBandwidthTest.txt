@@ -1,0 +1,20 @@
+./test Starting...
+
+Running on...
+
+NVIDIA GeForce GTX 950M
+
+Quick Mode
+
+Host to Device Bandwidth, 1 Device(s), Paged memory, direct access
+   Transfer Size (Bytes)	Bandwidth(MB/s)
+   33554432			1425.4
+
+Device to Host Bandwidth, 1 Device(s), Paged memory, direct access
+   Transfer Size (Bytes)	Bandwidth(MB/s)
+   33554432			1508.3
+
+Device to Device Bandwidth, 1 Device(s)
+   Transfer Size (Bytes)	Bandwidth(MB/s)
+   33554432			25823.3
+

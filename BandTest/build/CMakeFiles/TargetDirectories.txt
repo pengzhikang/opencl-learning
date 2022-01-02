@@ -1,0 +1,3 @@
+/home/pengzhikang/project/opencl/BandTest/build/CMakeFiles/test.dir
+/home/pengzhikang/project/opencl/BandTest/build/CMakeFiles/edit_cache.dir
+/home/pengzhikang/project/opencl/BandTest/build/CMakeFiles/rebuild_cache.dir
