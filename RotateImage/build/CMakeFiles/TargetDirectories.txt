@@ -1,3 +1,0 @@
-/home/pengzhikang/project/opencl/RotateImage/build/CMakeFiles/test.dir
-/home/pengzhikang/project/opencl/RotateImage/build/CMakeFiles/edit_cache.dir
-/home/pengzhikang/project/opencl/RotateImage/build/CMakeFiles/rebuild_cache.dir

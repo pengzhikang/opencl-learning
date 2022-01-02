@@ -1,3 +1,0 @@
-/home/pengzhikang/project/opencl/CreateContext/build/CMakeFiles/test.dir
-/home/pengzhikang/project/opencl/CreateContext/build/CMakeFiles/edit_cache.dir
-/home/pengzhikang/project/opencl/CreateContext/build/CMakeFiles/rebuild_cache.dir

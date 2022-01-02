@@ -3,8 +3,7 @@ if [ ! -d ~/project/github/opencl-learning ]; then
 fi
 cp -rf ./* ~/project/github/opencl-learning/
 cd ~/project/github/opencl-learning
-for file in ./*:
-do
+for file in ./*; do
     echo $file
     if [ -d $file ]; then
         if [ -d $file/build ]; then

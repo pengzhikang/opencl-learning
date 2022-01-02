@@ -1,3 +1,0 @@
-/home/firefly/data/pengzhikang/project/try-opencl/Img2col/build/CMakeFiles/rebuild_cache.dir
-/home/firefly/data/pengzhikang/project/try-opencl/Img2col/build/CMakeFiles/test.dir
-/home/firefly/data/pengzhikang/project/try-opencl/Img2col/build/CMakeFiles/edit_cache.dir
