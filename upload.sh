@@ -13,6 +13,6 @@ for file in ./*; do
 done
 # echo \"$1\"
 git add *
-git commit -m \"$1\"
+git commit -m "add readmg.md file"
 git push -u origin master
         
