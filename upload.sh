@@ -5,8 +5,9 @@ cp -rf ./* ~/project/github/opencl-learning/
 cd ~/project/github/opencl-learning
 for file in ./*:
 do
+    echo $file
     if [ -d $file ]; then
-        if [ -d $file/build]; then
+        if [ -d $file/build ]; then
             rm -rf $file/build
         fi
     fi
