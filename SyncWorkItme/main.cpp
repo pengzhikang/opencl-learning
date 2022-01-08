@@ -39,10 +39,11 @@ void sync_opencl(cl_device_id device)
 	}
     size_t wnum = 0;
     clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_ITEM_SIZES, 0, NULL, &wnum);
-    size_t wsize[wnum/sizeof(size_t)];
+	size_t max_dims = wnum/sizeof(size_t);
+    size_t wsize[max_dims];
     clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_ITEM_SIZES, wnum, wsize, NULL);
     size_t allws = 1;
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < max_dims; i++)
     {
         allws *= wsize[i];
     }
@@ -71,26 +72,51 @@ void sync_opencl(cl_device_id device)
 	assert(errcode == CL_SUCCESS);
 	size_t maxWorkGroupSize = 0;
 	clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(size_t), &maxWorkGroupSize, NULL);
+	// maxWorkGroupSize /= 4;
 	sprintf(kernelSource, "-D  GROUP_NUMBER_OF_WORKITEMS=%zu", maxWorkGroupSize);
 	errcode = clBuildProgram(program, 1, &device, kernelSource, NULL, NULL);
-    printf("%d,%d\n", kernelLength,errcode);
+   	printf("%d,%d\n", kernelLength,errcode);
 	assert(errcode == CL_SUCCESS);
 	free(kernelSource);
 	kernelSource = NULL;
 	cl_kernel kernel = clCreateKernel(program, "kernel_test", &errcode);
 	assert(errcode == CL_SUCCESS);
     printf("contentLnegth:%d\nmaxWorkGroupSize:%d\n", contentLnegth, maxWorkGroupSize);
-	cl_mem src2MemObj = clCreateBuffer(context, CL_MEM_READ_WRITE, maxWorkGroupSize, NULL, &errcode);
+	cl_mem src2MemObj = clCreateBuffer(context, CL_MEM_READ_WRITE, contentLnegth / maxWorkGroupSize, NULL, &errcode);
 	assert(errcode == CL_SUCCESS);
-	cl_mem dstMemObj = clCreateBuffer(context, CL_MEM_READ_WRITE, maxWorkGroupSize * maxWorkGroupSize * sizeof(int), NULL, &errcode);
+	cl_mem dstMemObj = clCreateBuffer(context, CL_MEM_READ_WRITE, contentLnegth / maxWorkGroupSize, NULL, &errcode);
 	assert(errcode == CL_SUCCESS);
 	errcode |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &dstMemObj);
 	errcode |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &src1MemObj);
 	errcode |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &src2MemObj);
+	// errcode |= clSetKernelArg(kernel, 3, sizeof(size_t), &max_dims);
 	assert(errcode == CL_SUCCESS);
-	const size_t cs[] = { (size_t)contentLnegth / sizeof(int) };
-	const size_t mw[] = { maxWorkGroupSize };
-	errcode = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, cs, mw, 0, NULL, NULL);
+	size_t cs[max_dims];
+	size_t mw[max_dims];
+	// 假设max_dims = 3,最大维度分别是256,256,256
+	// 那么我们进行了操作之后
+	for(int i = 0; i < max_dims; i++)
+	{
+		if (i == 0)
+		{
+			cs[i] = wsize[i];
+			mw[i] = maxWorkGroupSize;
+		}
+		else
+		{
+			cs[i] = wsize[i];
+			mw[i] = 1;
+		}
+	}
+	// const size_t cs[] = { (size_t)contentLnegth / sizeof(int) };
+	// const size_t mw[] = { maxWorkGroupSize };
+	// 打印一下
+	for (int i = 0; i < max_dims; i++)
+	{
+		printf("%d:(%d, %d)\n", i, cs[i], mw[i]);
+	}
+	errcode = clEnqueueNDRangeKernel(command_queue, kernel, max_dims, NULL, cs, mw, 0, NULL, NULL);
+	printf("%d----\n", errcode);
 	assert(errcode == CL_SUCCESS);
 	clFinish(command_queue);
 	int* pDeviceBuffer = (int*)malloc(contentLnegth);
@@ -144,6 +170,9 @@ void print_device(cl_platform_id platform)
 		get_device_info<cl_device_type>(devices[i], CL_DEVICE_TYPE, "cl_device_type");
 		get_device_info<cl_uint>(devices[i], CL_DEVICE_MAX_CLOCK_FREQUENCY, "cl_device_max_clock_frequency");
 		get_device_info<cl_ulong>(devices[i], CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, "cl_device_global_mem_cacheline_size");
+		get_device_info<cl_uint>(devices[i], CL_DEVICE_MAX_COMPUTE_UNITS, "cl_device_max_compute_units");
+		get_device_info<size_t>(devices[i], CL_DEVICE_PROFILING_TIMER_RESOLUTION, "cl_device_profiling_timer_resoulution");
+		get_device_info<cl_uint>(devices[i], CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, "cl_device_max_work_item_dimensions");
 		sync_opencl(devices[i]);
 	}
 	free(devices);

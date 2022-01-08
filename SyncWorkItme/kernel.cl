@@ -3,14 +3,12 @@ __kernel void kernel_test(__global int *pDst,
 {
     local int tmpBuffer[GROUP_NUMBER_OF_WORKITEMS];
     const int index = get_local_id(0);
-    const int group_index = get_group_id(0);
-    int group_count = get_num_groups(0);
-    const uint max_dims = get_work_dim();
-    for (int i = 0; i < max_dims; i++)
-    {
-        index *= get_local_id(i);
-        
-    }
+
+    const int gng0 = get_num_groups(0);
+    const int gng1 = get_num_groups(1);
+    const int gng2 = get_num_groups(2);
+    int group_index = get_group_id(0) * gng1 * gng2 + get_group_id(1) * gng2 + get_group_id(2);
+    int group_count = gng0 * gng1 * gng2;
     int address_offset = group_index * GROUP_NUMBER_OF_WORKITEMS+index;
     //第一次迭代从pSrc1获取数据
     __global int *pData = pSrc1;
