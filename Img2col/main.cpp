@@ -9,14 +9,23 @@
 #define _LINE_ 20
 int i_c = 3;
 int o_c = 4;
-int ksize = 2;
-int img = 6;
-int ds = 2;
-int pad = 0;
-const int ARRAY_SIZE = i_c * img * img;
-const int height_col = (img + 2 * 0 - (0 * (ksize - 1) + 1)) / ds + 1;
-const int width_col = (img + 2 * 0 - (0 * (ksize - 1) + 1)) / ds + 1;
-const int col_chw = i_c * ksize * ksize * height_col * width_col;
+int ksizeh = 2;
+int ksizew = 2;
+int imgh = 5;
+int imgw = 5;
+int dsh = 2;
+int dsw = 2;
+int padh = 1;
+int padw = 1;
+const int ARRAY_SIZE = i_c * imgh * imgw;
+// height_col和width_col代表输出的一张特征图的长宽
+const int height_col = (imgh - ksizeh + 2 * padh) / dsh + 1;
+const int width_col = (imgw - ksizew + 2 * padw) / dsw + 1;
+/* col_chw代表img2col后的矩阵元素个数
+高度:i_c * ksize * ksize
+宽度:height_col * width_col
+*/
+const int col_chw = (i_c * ksizeh * ksizew) * (height_col * width_col);
 char *ReadKernelSourceFile(const char *filename, size_t *length)
 {
     FILE *file = NULL;
@@ -245,15 +254,15 @@ int main(int argc,char **argv)
     errNum = clSetKernelArg(kernel,arg_idx,sizeof (cl_mem),
                             &memObjects[0]);
     errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int), &col_chw);
-    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&img);
-    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&img);
+    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&imgh);
+    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&imgw);
     errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&i_c);
-    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&ksize);
-    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&ksize);
-    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&pad);
-    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&pad);
-    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&ds);
-    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&ds);
+    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&ksizeh);
+    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&ksizew);
+    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&padh);
+    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&padw);
+    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&dsh);
+    errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&dsw);
     errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&height_col);
     errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (int),&width_col);
     errNum |= clSetKernelArg(kernel,++arg_idx,sizeof (cl_mem),&memObjects[1]);
@@ -264,7 +273,7 @@ int main(int argc,char **argv)
                 kernel,memObjects);
         return 1;
     }
-    size_t globalWorkSize[1] = { ARRAY_SIZE };
+    size_t globalWorkSize[1] = { col_chw };
     size_t localWorkSize[1] = { 1 };
     // 执行内核
     errNum = clEnqueueNDRangeKernel (commandQueue,kernel,
@@ -294,9 +303,9 @@ int main(int argc,char **argv)
     printf("\n");
     printf("------------------------------\n");
     for (int i = 0; i < i_c; i++){
-        for (int j = 0; j < img; j++){
-            for (int m = 0; m < img; m++){
-                printf("%4d ", int(a[i*img*img + j *img + m]));
+        for (int j = 0; j < imgh; j++){
+            for (int m = 0; m < imgw; m++){
+                printf("%4d ", int(a[i*imgh*imgw + j *imgw + m]));
             }
             printf("\n");
         }
@@ -304,9 +313,9 @@ int main(int argc,char **argv)
     }
     for (int i = 0; i < height_col * width_col; i++)
     {
-        for (int j = 0; j < ksize * ksize * i_c; j++)
+        for (int j = 0; j < ksizeh * ksizew * i_c; j++)
         {
-            int num = i * ksize * ksize * i_c + j;
+            int num = i * ksizeh * ksizew * i_c + j;
             printf("%4d ",int(result[num]));
         }
         printf("\n");
