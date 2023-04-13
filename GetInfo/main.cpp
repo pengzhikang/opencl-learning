@@ -10,7 +10,7 @@ void get_device_info(cl_device_id device, cl_device_info param_name, std::string
     T* info;
     size_t info_size = 0;
     clGetDeviceInfo(device, param_name, 0, NULL, &info_size);
-    info = (T*)malloc(info_size / sizeof(T));
+    info = (T*)malloc(info_size);
     std::cout << name <<" info num " << info_size / sizeof(T) << ":";
     clGetDeviceInfo(device, param_name, info_size, info, &info_size);
     
